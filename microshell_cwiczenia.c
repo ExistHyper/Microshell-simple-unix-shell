@@ -1,28 +1,25 @@
 #include <stdio.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
 #include <unistd.h>
-#include <errno.h>
-
-#define BUFSIZ 128
-
-int main(int argc, char *argv[]){
-    char buf[BUFSIZ];
-    int f,i,n;
-
-    if(argc <= 1)
-        while ((n = read(0, buf, BUFSIZ)) > 0)
-            write(1, buf, n);
-
-    for(i=1; i<argc; i++){
-        if((f = open(argv[i], O_RDONLY)) > 0){
-            while ((n = read(f, buf, BUFSIZ)) > 0)
-                write(1, buf, n);
-            close(f);
-        } else {
-            perror(argv[i]);
+#include <sys/wait.h>
+#include <string.h>
+int main(){
+    //use strtok
+    while(1){
+        char* argument_list[] = {"ls",NULL};
+        char
+        char commands[32];
+        printf("\ntype $ ");
+        fgets(commands, 32, stdin);
+        strtok(commands,)
+        commands[strlen(commands) - 1] = 0;
+        pid_t id = fork();
+        if(id == 0){
+            execvp(commands, argument_list);
         }
+        else{
+            wait(NULL);
+            printf("parent process\n");
+        }
+        printf("%s\n", commands);
     }
-    return 0;
 }
