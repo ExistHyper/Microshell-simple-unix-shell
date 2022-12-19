@@ -5,12 +5,12 @@
 int main(){
     //use strtok
     while(1){
-        char* argument_list[] = {"ls",NULL};
-        char
+        char argument_list[32];
+        char *buf;
         char commands[32];
         printf("\ntype $ ");
         fgets(commands, 32, stdin);
-        strtok(commands,)
+        buf = strtok(commands, argument_list);
         commands[strlen(commands) - 1] = 0;
         pid_t id = fork();
         if(id == 0){
