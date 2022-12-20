@@ -9,7 +9,9 @@
 #include <sys/wait.h>
 
 char arr_of_commands[][32] = {"hostname", "whoami", "exit", "pwd", "help", "cd", "cd ~", "cd ..", "cd /", "clear","bash" };
-char commands[32];
+char *commands[32];
+char input[32];
+int fork_value;
 void get_hostname();
 void get_login();
 void get_current_dir();
@@ -18,10 +20,36 @@ void unknown_command_error();
 void help_option();
 void my_cd();
 void clear();
-void bash();
-
+void tokenization(char input_token[32]){
+    int i = 0;
+    char *token_command = strtok(input_token," \n\t");
+        while(token_command != NULL){
+            commands[i++] = token_command;
+            token_command = strtok(NULL," \n\t");
+        }
+        commands[i++] = NULL;
+    return;
+}
+void fork_commands(){
+    int flag = 0;
+        for(int i = 0; i < 11; i++){
+            if(strcmp(arr_of_commands[i], commands[0]) == 0){
+                flag = 1;
+            }
+        }
+        if(flag == 0){
+            pid_t id = fork();
+            if(id == 0){
+                fork_value = execvp(commands[0], commands);
+            }else{
+                wait(NULL);
+        }
+        }
+        
+}
 
 int main(){
+    int i  = 0;
     printf("****WELCOME TO MICROSHELL****\n");
     printf("\n");
 
@@ -29,11 +57,11 @@ int main(){
         char current_dir[PATH_MAX];
         getcwd(current_dir, PATH_MAX);
         printf("[%s] $ ", current_dir);
-        fgets(commands, 32, stdin);
-        commands[strlen(commands) - 1] = 0; //usuwanie znaku konca stringu
-        
+        fgets(input, 32, stdin);
+        input[strlen(input) - 1] = 0;
+        tokenization(input);
 
-
+        fork_commands();
         get_hostname();
         get_login();
         get_current_dir();
@@ -42,12 +70,13 @@ int main(){
         help_option();
         my_cd();
         clear();
-        bash();
-
+        printf("\nfork value: %d\n",fork_value);
+    
+        
     }
 }
 void get_hostname(){
-    if(strcmp(commands,"hostname") == 0){
+    if(strcmp(commands[0],"hostname") == 0){
     char hostname[_SC_HOST_NAME_MAX];
     gethostname(hostname,40);
     printf("%s\n", hostname); 
@@ -55,77 +84,63 @@ void get_hostname(){
     
 }
 void get_login(){
-    if(strcmp(commands,"whoami") == 0){
+    if(strcmp(commands[0],"whoami") == 0){
         printf("%s\n",getlogin());
     }
 }
 
 void unknown_command_error(){
+    int flag = 0;
     for(int i = 0; i < 11; i++){
-        if(strcmp(arr_of_commands[i], commands) != 0)
-            printf("Command not recognized.\nType 'help' for infornations\n");
+        if(strcmp(arr_of_commands[i], commands[0]) != 0 && fork_value < 0)
+            flag = 1;
     }
+    if(flag == 1)
+        printf("Command not recognized.\nType 'help' for infornations\n");
 }
-void bash(){
-    for(int i = 0; i < 11; i++){
-        if(strcmp(commands, arr_of_commands[i]) != 0){
-            pid_t id = fork();
-            if(id == 0){
-                execvp(commands)
-            }
-            else{
-                wait(NULL);
-                printf("We re back\n");
-                } 
-        }
-}  
-}
-    
-    
-
 
 void exit_function(){
-    if(strcmp(commands,"exit") == 0){
+    if(strcmp(commands[0],"exit") == 0){
             exit(1);
     }
     
 }
 
 void get_current_dir(){
-    if(strcmp(commands,"pwd") == 0){
+    if(strcmp(commands[0],"pwd") == 0){
         char current_dir[PATH_MAX];
         getcwd(current_dir, PATH_MAX);
-        printf("%s\n",current_dir);
+        printf("my pwd: %s\n",current_dir);
     }
     
 
 }
 
 void help_option(){
-    if(strcmp(commands,"help") == 0){
+    if(strcmp(commands[0],"help") == 0){
         printf(" List of commands:\n'exit'- leave microshell\n'pwd' - display current directory\n'whoami' - display login\n'hostname' - display hostname");
         printf("Autor Jan Kordas\nWydzial informatyki i informatyki UAM Poznan\n");
     }
 }
 
 void my_cd(){
-    if(strcmp(commands,"cd") == 0){
+    if(strcmp(commands[0],"cd") == 0){
         chdir(getenv("HOME"));
     }
-    else if(strcmp(commands, "cd ~") == 0){
+    else if(strcmp(commands[0], "cd ~") == 0){
         chdir(getenv("HOME"));
     }
-    else if(strcmp(commands, "cd ..") == 0){
+    else if(strcmp(commands[0], "cd ..") == 0){
         chdir("..");
     }
-    else if(strcmp(commands, "cd /") == 0){
+    else if(strcmp(commands[0], "cd /") == 0){
         chdir("/");
     }
 
     }
 
 void clear(){
-    if(strcmp(commands,"clear") == 0)
+    if(strcmp(commands[0],"clear") == 0)
 	    printf("clear\n");
     
 }
