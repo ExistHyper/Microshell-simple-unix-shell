@@ -11,42 +11,15 @@
 char arr_of_commands[][32] = {"hostname", "whoami", "exit", "pwd", "help", "cd", "cd ~", "cd ..", "cd /", "clear","bash" };
 char *commands[32];
 char input[32];
-int fork_value;
 void get_hostname();
 void get_login();
 void get_current_dir();
 void exit_function();
-void unknown_command_error();
 void help_option();
 void my_cd();
 void clear();
-void tokenization(char input_token[32]){
-    int i = 0;
-    char *token_command = strtok(input_token," \n\t");
-        while(token_command != NULL){
-            commands[i++] = token_command;
-            token_command = strtok(NULL," \n\t");
-        }
-        commands[i++] = NULL;
-    return;
-}
-void fork_commands(){
-    int flag = 0;
-        for(int i = 0; i < 11; i++){
-            if(strcmp(arr_of_commands[i], commands[0]) == 0){
-                flag = 1;
-            }
-        }
-        if(flag == 0){
-            pid_t id = fork();
-            if(id == 0){
-                fork_value = execvp(commands[0], commands);
-            }else{
-                wait(NULL);
-        }
-        }
-        
-}
+void tokenization(char input_token[32]);
+void fork_and_unknown_commands();
 
 int main(){
     int i  = 0;
@@ -60,20 +33,45 @@ int main(){
         fgets(input, 32, stdin);
         input[strlen(input) - 1] = 0;
         tokenization(input);
-
-        fork_commands();
+        fork_and_unknown_commands();
         get_hostname();
         get_login();
         get_current_dir();
         exit_function();
-        unknown_command_error();
         help_option();
         my_cd();
         clear();
-        printf("\nfork value: %d\n",fork_value);
-    
-        
     }
+}
+void tokenization(char input_token[32]){
+    int i = 0;
+    char *token_command = strtok(input_token," \n\t");
+        while(token_command != NULL){
+            commands[i++] = token_command;
+            token_command = strtok(NULL," \n\t");
+        }
+        commands[i++] = NULL;
+    return;
+}
+void fork_and_unknown_commands(){
+    int flag = 0;
+    int status;
+        for(int i = 0; i < 11; i++){
+            if(strcmp(arr_of_commands[i], commands[0]) == 0)
+                flag = 1;
+        }
+        if(flag == 0){
+            int execvp_value;
+            pid_t id = fork();
+            if(id == 0)
+                execvp_value = execvp(commands[0], commands);
+            else
+                wait(NULL);
+            if(execvp_value < 0){
+                printf("Command not recognized.\nType 'help' for infornations\n");
+                exit(1);     
+            }
+        }
 }
 void get_hostname(){
     if(strcmp(commands[0],"hostname") == 0){
@@ -87,16 +85,6 @@ void get_login(){
     if(strcmp(commands[0],"whoami") == 0){
         printf("%s\n",getlogin());
     }
-}
-
-void unknown_command_error(){
-    int flag = 0;
-    for(int i = 0; i < 11; i++){
-        if(strcmp(arr_of_commands[i], commands[0]) != 0 && fork_value < 0)
-            flag = 1;
-    }
-    if(flag == 1)
-        printf("Command not recognized.\nType 'help' for infornations\n");
 }
 
 void exit_function(){
@@ -124,20 +112,30 @@ void help_option(){
 }
 
 void my_cd(){
-    if(strcmp(commands[0],"cd") == 0){
+    char dir_before_chdir[PATH_MAX];
+    getcwd(dir_before_chdir, PATH_MAX);
+    if(strcmp(commands[0],"cd") == 0 && commands[1] == NULL){
         chdir(getenv("HOME"));
     }
-    else if(strcmp(commands[0], "cd ~") == 0){
+    else if((strcmp(commands[0], "cd") == 0) && (strcmp(commands[1], "~") == 0)){
         chdir(getenv("HOME"));
     }
-    else if(strcmp(commands[0], "cd ..") == 0){
+    else if((strcmp(commands[0], "cd") == 0) && (strcmp(commands[1], "..") == 0)){
         chdir("..");
     }
-    else if(strcmp(commands[0], "cd /") == 0){
+    else if((strcmp(commands[0], "cd") == 0) && (strcmp(commands[1], "/") == 0)){
         chdir("/");
     }
-
+    else if(strcmp(commands[0], "cd") == 0 && commands[1] != NULL && commands[2] == NULL){
+        chdir(commands[1]);
+        char dir_after_chdir[PATH_MAX];
+        getcwd(dir_after_chdir, PATH_MAX);
+        if(strcmp(dir_before_chdir,dir_after_chdir) == 0)
+            printf("No such directory\n");
+    }else if(strcmp(commands[0], "cd") == 0 && commands[1] != NULL && commands[2] != NULL){
+        printf("to many arguments\n");
     }
+}
 
 void clear(){
     if(strcmp(commands[0],"clear") == 0)
