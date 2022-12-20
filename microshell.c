@@ -98,7 +98,7 @@ void get_current_dir(){
     if(strcmp(commands[0],"pwd") == 0){
         char current_dir[PATH_MAX];
         getcwd(current_dir, PATH_MAX);
-        printf("my pwd: %s\n",current_dir);
+        printf("%s\n",current_dir);
     }
     
 
@@ -106,7 +106,7 @@ void get_current_dir(){
 
 void help_option(){
     if(strcmp(commands[0],"help") == 0){
-        printf(" List of commands:\n'exit'- leave microshell\n'pwd' - display current directory\n'whoami' - display login\n'hostname' - display hostname");
+        printf("List of commands:\n'exit'- leave microshell\n'pwd' - display current directory\n'cd' - change directory\n'whoami' - display login\n'hostname' - display hostname\n");
         printf("Autor Jan Kordas\nWydzial informatyki i informatyki UAM Poznan\n");
     }
 }
