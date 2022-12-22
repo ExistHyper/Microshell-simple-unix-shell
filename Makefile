@@ -1,2 +1,4 @@
 program:
-    gcc microshell.c -o microshell
+	 gcc microshell.c -o microshell
+clean:
+	rm -f program microshell

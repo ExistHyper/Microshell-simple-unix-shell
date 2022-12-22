@@ -20,6 +20,7 @@ void my_cd();
 void clear();
 void tokenization(char input_token[32]);
 void fork_and_unknown_commands();
+void powtorzenie();
 
 int main(){
     int i  = 0;
@@ -33,6 +34,7 @@ int main(){
         fgets(input, 32, stdin);
         input[strlen(input) - 1] = 0;
         tokenization(input);
+        powtorzenie();
         fork_and_unknown_commands();
         get_hostname();
         get_login();
@@ -141,4 +143,11 @@ void clear(){
     if(strcmp(commands[0],"clear") == 0)
 	    printf("clear\n");
     
+}
+
+void powtorzenie(){
+    int i;
+    for(i=0;i<=10;i++){
+        printf("%s ",commands[i]);
+    }
 }
