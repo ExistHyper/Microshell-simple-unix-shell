@@ -18,7 +18,7 @@
 #define WHITE "\033[0;37m"
 #define RESET "\033[0m"
 
-char arr_of_commands[][32] = {"hostname", "whoami", "exit", "pwd", "help", "cd", "cd ~", "cd ..", "cd /", "clear","bash","colors" };
+char arr_of_commands[][32] = {"hostname", "whoami", "exit", "pwd", "help", "cd", "cd ~", "cd ..", "cd /", "clear","bash","colors","color" };
 char *commands[32];
 char input[32];
 void tokenization(char input_token[32]);
@@ -30,25 +30,20 @@ void exit_function();
 void help_option();
 void my_cd();
 void colors();
+void color();
 void clear();
 int main(){
     int i  = 0;
-    printf("****WELCOME TO MICROSHELL****\n");
+    printf(RED "****WELCOME TO MICROSHELL****\n" RESET);
     printf("\n");
 
     while(1){
         char current_dir[PATH_MAX];
         getcwd(current_dir, PATH_MAX);
-        printf("[%s] $ " ,current_dir);
+        printf("[%s] $ ",current_dir);
         fgets(input, 32, stdin);
-        int num;
-        printf("eNTER NUM: ");
-        scanf("%d", &num);
-        printf("num = %d",num);
         input[strlen(input) - 1] = 0;
         tokenization(input);
-        colors();
-        continue;
         fork_and_unknown_commands();
         get_hostname();
         get_login();
@@ -56,6 +51,8 @@ int main(){
         exit_function();
         help_option();
         my_cd();
+        colors();
+        color();
         clear();
     }
 }
@@ -73,7 +70,7 @@ void tokenization(char input_token[32]){
 void fork_and_unknown_commands(){
     int flag = 0;
     int status;
-    for(int i = 0; i < 12; i++){
+    for(int i = 0; i < 13; i++){
         if(strcmp(arr_of_commands[i], commands[0]) == 0)
             flag = 1;
     }
@@ -123,7 +120,7 @@ void get_current_dir(){
 
 void help_option(){
     if(strcmp(commands[0],"help") == 0){
-        printf("List of commands:\n'exit'- leave microshell\ncd' - change directory\n'pwd' - display current directory\n'whoami' - display login\n'hostname' - display hostname\n");
+        printf("List of commands:\n'exit'- leave microshell\n'cd' - change directory\n'pwd' - display current directory\n'whoami' - display login\n'hostname' - display hostname\n'colors' - change display colors\n");
         printf("Autor Jan Kordas\nWydzial informatyki i informatyki UAM Poznan\n");
     }
 }
@@ -156,10 +153,45 @@ void my_cd(){
 void colors (){
     if(strcmp(commands[0],"colors") == 0){
         int color;
-        printf("List of available colors:\n1.Black\n2.Red\n3.Green\n4.Yellow\n5.Blue\n6.Purple\n7.Cyan\n8.White\n");
         printf("To change colors use commands 'color {name of color in list}'\n");
+        printf("List of available colors:\n1.black\n2.red\n3.green\n4.yellow\n5.blue\n6.purple\n7.cyan\n8.white\n9.reset\n");
     }
-
+}
+void color(){
+    if(strcmp(commands[0],"color") == 0){
+        if(commands[1] == NULL){
+            printf("No color selected, please try again.\nFor help type 'colors'\n");
+        }
+        else if(strcmp(commands[1],"black") == 0){
+            printf(BLACK);
+        }
+        else if(strcmp(commands[1],"red") == 0){
+            printf(RED);
+        }
+        else if(strcmp(commands[1],"green") == 0){
+            printf(GREEN);
+        }else if(strcmp(commands[1],"yellow") == 0){
+            printf(YELLOW);
+        }
+        else if(strcmp(commands[1],"blue") == 0){
+            printf(BLUE);
+        }
+        else if(strcmp(commands[1],"purple") == 0){
+            printf(PURPLE);
+        }
+        else if(strcmp(commands[1],"cyan") == 0){
+            printf(CYAN);
+        }
+        else if(strcmp(commands[1],"white") == 0){
+            printf(WHITE);
+        }
+        else if(strcmp(commands[1],"reset") == 0){
+            printf(RESET);
+        }
+        else{
+            printf("Could not match color, please try again.\nFor help type 'colors'");
+        }
+    }
 }
 
 void clear(){
