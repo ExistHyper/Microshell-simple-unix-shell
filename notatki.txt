@@ -1,0 +1,18 @@
+1.STRTOK " \n\t"
+    W kontekście podanego kodu, znaki białe " \n\t" są używane jako delimitery dla funkcji strtok.
+    Funkcja strtok jest używana do tokenizacji ciągu znaków, co oznacza podzielenie ciągu na mniejsze 
+    podciągi lub tokeny na podstawie zestawu znaków delimiterów. Kiedy strtok napotyka znak delimitera
+    w ciągu wejściowym, zastępuje go znakiem null, tworząc w ten sposób nowy token z tekstu poprzedzającego delimiter.
+    Funkcja zwraca wskaźnik do początku tego tokenu.W tym przypadku znaki białe " \n\t" są używane jako delimitery, 
+    co oznacza, że ​​każde wystąpienie spacji, znaku nowej linii lub tabulatora w ciągu wejściowym będzie używane 
+    do jego podziału na różne tokeny. Funkcja strtok skanuje ciąg input_token i szuka znaków białych, jeśli znajdzie je,
+    zastępuje je znakiem null i zwraca wskaźnik do tokenu znalezionego przed znakiem białym.
+    Kontynuuje ten proces skanowania i tokenizacji ciągu, aż nie znajdzie więcej tokenów, a następnie zwraca wskaźnik null.
+2.FUNKCJA CLEAR
+    https://www.geeksforgeeks.org/clear-console-c-language/
+    "printf("\e[1;1H\e[2J");" to polecenie służące do czyszczenia ekranu terminala w języku C.
+    "\e" jest znakiem ucieczki, który oznacza, że ​​następujące znaki powinny być interpretowane jako sekwencja ucieczki.
+    "[1;1H" to sekwencja ucieczki do przeniesienia kursora na pozycję określoną przez dwie liczby, które ją następują,
+    w tym przypadku wiersza 1,kolumny 1 (lewy górny róg ekranu)."[2J" to sekwencja ucieczki do wyczyszczenia całego ekranu.
+    Jest to polecenie Erase in Display (ED) z parametrem 2, które czyści cały ekran. Razem te polecenia przenoszą kursor 
+    do lewego górnego rogu ekranu, a następnie czyści cały ekran, skutecznie resetując terminal.

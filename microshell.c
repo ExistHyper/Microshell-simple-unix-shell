@@ -1,37 +1,9 @@
-#include <stdio.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <linux/limits.h>
-#include <string.h>
-#include <dirent.h>
-#include <sys/types.h>
-#include <signal.h>
-#include <sys/wait.h>
-
-#define BLACK "\033[0;30m"
-#define RED "\033[0;31m"
-#define GREEN "\033[0;32m"
-#define YELLOW "\033[0;33m"
-#define BLUE "\033[0;34m"
-#define PURPLE "\033[0;35m"
-#define CYAN "\033[0;36m"
-#define WHITE "\033[0;37m"
-#define RESET "\033[0m"
+#include "microshell.h"
 
 char arr_of_commands[][32] = {"hostname", "whoami", "exit", "pwd", "help", "cd", "cd ~", "cd ..", "cd /", "clear","bash","colors","color" };
 char *commands[32];
 char input[32];
-void tokenization(char input_token[32]);
-void fork_and_unknown_commands();
-void get_hostname();
-void get_login();
-void get_current_dir();
-void exit_function();
-void help_option();
-void my_cd();
-void colors();
-void color();
-void clear();
+
 int main(){
     int i  = 0;
     printf(RED "****WELCOME TO MICROSHELL****\n" RESET);
@@ -63,7 +35,6 @@ void tokenization(char input_token[32]){
         commands[i++] = token_command;
         token_command = strtok(NULL," \n\t");
     }
-    //  CO TO JEST \N\T PAMIETAJ O TYM
         commands[i++] = NULL;
     return;
 }
@@ -76,8 +47,8 @@ void fork_and_unknown_commands(){
     }
     if(flag == 0){
         int execvp_value;
-        pid_t id = fork();
-        if(id == 0)
+        //pid_t id = fork();
+        if(!fork())
             execvp_value = execvp(commands[0], commands);
         else
             wait(NULL);
@@ -151,10 +122,12 @@ void my_cd(){
     }
 }
 void colors (){
-    if(strcmp(commands[0],"colors") == 0){
+    if(strcmp(commands[0],"colors") == 0 && commands[1] == NULL){
         int color;
         printf("To change colors use commands 'color {name of color in list}'\n");
         printf("List of available colors:\n1.black\n2.red\n3.green\n4.yellow\n5.blue\n6.purple\n7.cyan\n8.white\n9.reset\n");
+    }else if(strcmp(commands[0],"colors") == 0 && commands[1] != NULL){
+        printf("Too many arguments for function 'colors'\n");
     }
 }
 void color(){
@@ -162,40 +135,40 @@ void color(){
         if(commands[1] == NULL){
             printf("No color selected, please try again.\nFor help type 'colors'\n");
         }
-        else if(strcmp(commands[1],"black") == 0){
+        else if(strcmp(commands[1],"black") == 0 && commands[2] == NULL){
             printf(BLACK);
         }
-        else if(strcmp(commands[1],"red") == 0){
+        else if(strcmp(commands[1],"red") == 0 && commands[2] == NULL){
             printf(RED);
         }
-        else if(strcmp(commands[1],"green") == 0){
+        else if(strcmp(commands[1],"green") == 0 && commands[2] == NULL){
             printf(GREEN);
-        }else if(strcmp(commands[1],"yellow") == 0){
+        }else if(strcmp(commands[1],"yellow") == 0   && commands[2] == NULL){
             printf(YELLOW);
         }
-        else if(strcmp(commands[1],"blue") == 0){
+        else if(strcmp(commands[1],"blue") == 0 && commands[2] == NULL){
             printf(BLUE);
         }
-        else if(strcmp(commands[1],"purple") == 0){
+        else if(strcmp(commands[1],"purple") == 0 && commands[2] == NULL){
             printf(PURPLE);
         }
-        else if(strcmp(commands[1],"cyan") == 0){
+        else if(strcmp(commands[1],"cyan") == 0 && commands[2] == NULL){
             printf(CYAN);
         }
-        else if(strcmp(commands[1],"white") == 0){
+        else if(strcmp(commands[1],"white") == 0 && commands[2] == NULL){
             printf(WHITE);
         }
-        else if(strcmp(commands[1],"reset") == 0){
+        else if(strcmp(commands[1],"reset") == 0 && commands[2] == NULL){
             printf(RESET);
         }
         else{
-            printf("Could not match color, please try again.\nFor help type 'colors'");
+            printf("Could not match color, please try again.\nFor help type 'colors'\n");
         }
     }
 }
 
 void clear(){
     if(strcmp(commands[0],"clear") == 0)
-	    printf("clear\n");
-    
+	    printf("\e[1;1H\e[2J");
+//https://www.geeksforgeeks.org/clear-console-c-language/
 }
