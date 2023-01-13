@@ -16,3 +16,5 @@
     w tym przypadku wiersza 1,kolumny 1 (lewy górny róg ekranu)."[2J" to sekwencja ucieczki do wyczyszczenia całego ekranu.
     Jest to polecenie Erase in Display (ED) z parametrem 2, które czyści cały ekran. Razem te polecenia przenoszą kursor 
     do lewego górnego rogu ekranu, a następnie czyści cały ekran, skutecznie resetując terminal.
+3. WAIT(NULL)
+    oczekiwanie procesu macierzystego na zakonczenie procesu potomnego
