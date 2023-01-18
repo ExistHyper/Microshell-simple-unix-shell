@@ -227,37 +227,36 @@ void clear() {
 }
 
 void my_mv() {
-    int dest_file_open;
-    int file_open;
-    int file_remove;
-    char *destination[1];
-    char buf[10];
-    int bytes_read = 0;
-    // change file or dir name
     if (!strcmp(commands[0],"mv") && (!commands[1] || !commands[2])) {
-        printf("Mising file operand\n");
+        printf("Missing file operand\n");
+        return;
     } else if (!strcmp(commands[0],"mv") && commands[1] && commands[2]) {
-        destination[0] = commands[arguments_counter];
-        dest_file_open = open(destination[0], O_CREAT | O_RDWR | 0644);
-        file_open = open(commands[1], O_RDWR);
-        if (file_open == -1) {
-            printf("Cannot find file or permission to file is denied:" RED "%s\n" RESET, commands[1]);
+
+        char *src = commands[1];
+        char *dest = commands[2];
+
+        int src_fd = open(src, O_RDONLY);
+        if (src_fd < 0) {
+            printf("Cannot find file or permission to file is denied: %s\n", src);
+            return;
         }
-        while (bytes_read >= 0) {
-          bytes_read = read(file_open, buf, 10);
-          write(dest_file_open, buf, bytes_read);
-          printf("bytes_read = %d\n",bytes_read);
+        int dest_fd = open(dest, O_RDWR | O_CREAT, 0644);
+        if (dest_fd < 0) {
+            printf("Cannot open destination file: %s\n", dest);
+            return;
         }
-        //read and copy to destination file
-        close(file_open);
-        close(dest_file_open);
-        file_remove = remove(commands[1]);
-        if (file_remove == -1) { 
-          printf("Unable to remove before change\n");                
-        } else {
-          printf("Removed correctly\n");
+        char buf[1024];
+        ssize_t bytes_read;
+        while ((bytes_read = read(src_fd, buf, sizeof(buf))) > 0) {
+            if (write(dest_fd, buf, bytes_read) != bytes_read) {
+                printf("Error writing to destination file: %s\n", dest);
+                break;
+            }
         }
-        
+        close(src_fd);
+        close(dest_fd);
+        if (remove(src) < 0) {
+            printf("Error removing source file: %s\n", src);
+        }
     }
-    // move to director
 }
