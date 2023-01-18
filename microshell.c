@@ -227,28 +227,34 @@ void clear() {
 }
 
 void my_mv() {
-    int dest_file_open;
-    int file_open;
-    int file_remove;
+    int dest_file_open = 0;
+    int file_open = 0;
+    int file_remove = 0;
     char *destination[1];
-    char buf[10];
+    char buf[1024];
     int bytes_read = 0;
     // change file or dir name
     if (!strcmp(commands[0],"mv") && (!commands[1] || !commands[2])) {
         printf("Mising file operand\n");
+    } else if (!strcmp(commands[0],"mv") && !strcmp(commands[1],commands[2])) {
+      printf("'%s' and '%s' are the same file\n", commands[1], commands[2]);
+      return;
     } else if (!strcmp(commands[0],"mv") && commands[1] && commands[2]) {
         destination[0] = commands[arguments_counter];
-        dest_file_open = open(destination[0], O_CREAT | O_RDWR | 0644);
-        file_open = open(commands[1], O_RDWR);
-        if (file_open == -1) {
-            printf("Cannot find file or permission to file is denied:" RED "%s\n" RESET, commands[1]);
+        dest_file_open = open(destination[0], O_CREAT | O_RDWR, 0644);
+        file_open = open(commands[1], O_RDONLY);
+        if (file_open < 0){
+            printf("Cannot find file or permission to file is denied:" RED " %s\n" RESET, commands[1]);
+            return;
         }
-        while (bytes_read >= 0) {
-          bytes_read = read(file_open, buf, 10);
-          write(dest_file_open, buf, bytes_read);
-          printf("bytes_read = %d\n",bytes_read);
+        while ((bytes_read = read(file_open, buf, sizeof(buf))) > 0) {
+          printf("%d/n", bytes_read);
+            if (write(dest_file_open, buf, bytes_read) != bytes_read) {
+                printf("%d", bytes_read);
+                printf("Error writing to destination file: %s\n", commands[2]);
+                break;
+            }
         }
-        //read and copy to destination file
         close(file_open);
         close(dest_file_open);
         file_remove = remove(commands[1]);
@@ -257,7 +263,6 @@ void my_mv() {
         } else {
           printf("Removed correctly\n");
         }
-        
-    }
     // move to director
+        }
 }
