@@ -8,7 +8,7 @@
 #include <signal.h>
 #include <sys/wait.h>
 #include <signal.h>
-#include <fcntl.h> // tworzenie plikow...
+#include <fcntl.h>
 
 #define BLACK "\033[0;30m"
 #define RED "\033[0;31m"
@@ -31,7 +31,8 @@ void my_cd();
 void colors();
 void color();
 void clear();
-void my_mv();
+void my_mv_files();
+void my_cp_files();
 
 char arr_of_commands[][32] = {
   "hostname",
@@ -47,7 +48,7 @@ char arr_of_commands[][32] = {
   "bash",
   "colors",
   "color",
-  "mv"
+  "-my"
 };
 char *commands[256];
 char input[256];
@@ -78,7 +79,8 @@ int main() {
     colors();
     color();
     clear();
-    my_mv();
+    my_mv_files();
+    my_cp_files();
   }
   return 0;
 }
@@ -97,8 +99,14 @@ void tokenization(char input_token[256]) {
 
 void fork_and_unknown_commands() {
   for (int i = 0; i < 14; i++) {
-    if (strcmp(arr_of_commands[i], commands[0]) == 0) {
-      return;
+    if (arguments_counter > 1) {
+      if (!strcmp(arr_of_commands[i], commands[0]) || !strcmp(arr_of_commands[i], commands[1])) {
+        return;
+      }
+    } else {
+      if (!strcmp(arr_of_commands[i], commands[0])) {
+        return;
+      }
     }
   }
   int execvp_value;
@@ -148,7 +156,7 @@ void get_current_dir() {
 
 void help_option() {
   if (!strcmp(commands[0], "help")) {
-    printf("List of commands:\n'exit'- leave microshell\n'cd' - change directory\n'pwd' - display current directory\n'whoami' - display login\n'hostname' - display hostname\n'colors' - change display colors\n");
+    printf("List of commands:\n'exit'- leave microshell\n'cd' - change directory\n'mv -my' - rename file\npwd' - display current directory\n'whoami' - display login\n'hostname' - display hostname\n'colors' - change display colors\n");
     printf("Autor Jan Kordas\nWydzial informatyki i informatyki UAM Poznan\n");
   }
   return;
@@ -226,43 +234,48 @@ void clear() {
   return;
 }
 
-void my_mv() {
+void my_mv_files() {
     int dest_file_open = 0;
     int file_open = 0;
     int file_remove = 0;
     char *destination[1];
     char buf[1024];
     int bytes_read = 0;
-    // change file or dir name
-    if (!strcmp(commands[0],"mv") && (!commands[1] || !commands[2])) {
+    // change file name
+    if (!strcmp(commands[0],"mv") && !strcmp(commands[1],"-my") && (!commands[2] || !commands[3])) {
         printf("Mising file operand\n");
-    } else if (!strcmp(commands[0],"mv") && !strcmp(commands[1],commands[2])) {
-      printf("'%s' and '%s' are the same file\n", commands[1], commands[2]);
+    } else if (!strcmp(commands[0],"mv") && !strcmp(commands[1],"-my") && !strcmp(commands[2],commands[3])) {
+      printf("'%s' and '%s' are the same file\n", commands[2], commands[3]);
       return;
-    } else if (!strcmp(commands[0],"mv") && commands[1] && commands[2]) {
-        destination[0] = commands[arguments_counter];
+    } else if (!strcmp(commands[0],"mv") && !strcmp(commands[1],"-my") && commands[2] && commands[3] && commands[4]) {
+      printf("Too much arguments to rename: %d\n", arguments_counter - 1);
+      return;
+    } else if (!strcmp(commands[0],"mv") && !strcmp(commands[1],"-my") && commands[2] && commands[3] && !commands[4]) {
+        destination[0] = commands[3];
         dest_file_open = open(destination[0], O_CREAT | O_RDWR, 0644);
-        file_open = open(commands[1], O_RDONLY);
+        file_open = open(commands[2], O_RDONLY);
         if (file_open < 0){
-            printf("Cannot find file or permission to file is denied:" RED " %s\n" RESET, commands[1]);
+            printf("Cannot find file or permission to file is denied:" RED " %s\n" RESET, commands[2]);
             return;
         }
         while ((bytes_read = read(file_open, buf, sizeof(buf))) > 0) {
-          printf("%d/n", bytes_read);
             if (write(dest_file_open, buf, bytes_read) != bytes_read) {
-                printf("%d", bytes_read);
-                printf("Error writing to destination file: %s\n", commands[2]);
+                printf("Error writing to destination file: %s\n", commands[3]);
                 break;
             }
         }
         close(file_open);
         close(dest_file_open);
-        file_remove = remove(commands[1]);
+        file_remove = remove(commands[2]);
         if (file_remove == -1) { 
-          printf("Unable to remove before change\n");                
-        } else {
-          printf("Removed correctly\n");
+          printf("Unable to remove before source file\n");                
         }
-    // move to director
-        }
+    }
+}
+
+void my_cp_files(){
+  if (!strcmp(commands[0],"cp") && !strcmp(commands[1],"-my") && commands[2] && commands[3] && !commands[4]){
+    printf("copy\n");
+  }
+
 }
