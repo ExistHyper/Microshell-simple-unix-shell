@@ -4,10 +4,7 @@
 #include <linux/limits.h>
 #include <string.h>
 #include <dirent.h>
-#include <sys/types.h>
-#include <signal.h>
 #include <sys/wait.h>
-#include <signal.h>
 #include <fcntl.h>
 
 #define SIZE 512
@@ -62,7 +59,7 @@ int main() {
         char current_dir[PATH_MAX];
         char prompt_hostname[_SC_HOST_NAME_MAX];
         char input[SIZE];
-        for (int i = 0; i < SIZE; i++){
+        for (int i = 0; i < SIZE; i++) {
             commands[i] = 0;
         }
         gethostname(prompt_hostname, 40);
@@ -153,7 +150,7 @@ void fork_and_unknown_commands() {
 void get_hostname() {
     char hostname[_SC_HOST_NAME_MAX];
     if (!strcmp(commands[0], "hostname")) {
-        gethostname(hostname, 40);
+        gethostname(hostname, _SC_HOST_NAME_MAX);
         printf("%s\n", hostname);
     }
     return;
@@ -279,7 +276,7 @@ void color() {
 
 void clear() {
     if (!strcmp(commands[0], "clear")) {
-        printf("\e[1;1H\e[2J");
+        printf("\e[H\e[2J\e[3J");
     }
     return;
 }
@@ -316,7 +313,7 @@ void my_mv_files() {
         close(destination_file);
         remove_file = remove(commands[2]);
         if (remove_file == -1) {
-            printf("Unable to remove before source file\n");
+            printf("Unable to remove source file\n");
         }
     }
 }

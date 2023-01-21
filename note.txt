@@ -9,6 +9,10 @@
     zastępuje je znakiem null i zwraca wskaźnik do tokenu znalezionego przed znakiem białym.
     Kontynuuje ten proces skanowania i tokenizacji ciągu, aż nie znajdzie więcej tokenów, a następnie zwraca wskaźnik null.
 2.FUNKCJA CLEAR
+Edit: I also recommend the use of \e[H\e[2J\e[3J as that is what cls/clear prints.
+This tells the terminal to move the cursor to the top left corner (\e[H), clear the screen (\e[2J),
+and clear the scrollback buffer (\e[3J).
+
     https://www.geeksforgeeks.org/clear-console-c-language/
     "printf("\e[1;1H\e[2J");" to polecenie służące do czyszczenia ekranu terminala w języku C.
     "\e" jest znakiem ucieczki, który oznacza, że ​​następujące znaki powinny być interpretowane jako sekwencja ucieczki.
