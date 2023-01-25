@@ -93,10 +93,10 @@ int main() {
 void tokenization(char input_token[SIZE]) {
     char * token_command = {0};
     int i = 0;
-    token_command = strtok(input_token, " ");
+    token_command = strtok(input_token, " \t");
     while (token_command) {
         commands[i++] = token_command;
-        token_command = strtok(NULL, " ");
+        token_command = strtok(NULL, " \t");
     }
     arguments_counter = i - 1;
     commands[i++] = NULL;
@@ -106,13 +106,10 @@ void handle_cp_mv_fork() {
     if (arguments_counter >= 1) {
         if (!strcmp(commands[0], "mv") && !strcmp(commands[1], "-my")) {
             my_mv_files();
-            return;
         } else if (!strcmp(commands[0], "cp") && !strcmp(commands[1], "-my")) {
             my_cp_files();
-            return;
         } else if ((strcmp(commands[0], "cp") || strcmp(commands[0], "mv")) && !strcmp(commands[1], "-my")) {
             printf("Command not recognized.\nDid you mean 'mv -my' or 'cp -my'?\n");
-            return;
         } else {
             fork_and_unknown_commands();
             return;
@@ -181,7 +178,10 @@ void get_current_dir() {
 
 void help_option() {
     if (!strcmp(commands[0], "help")) {
-        printf("List of commands:\n'exit'- leave microshell\n'cd' - change directory\n'mv -my' - rename file\npwd' - display current directory\n'whoami' - display login\n'hostname' - display hostname\n'colors' - change display colors\n");
+        printf("\n           List of commands         \n");
+        printf("-------------------------------------------- \n");
+        printf("    'exit'    | - leave microshell\n    'cd'      | - change directory\n    'mv -my'  | - rename file\n    'cp -my'  | - copy file\n    'pwd'     | - display current directory\n    'whoami'  | - display login\n    'hostname'| - display hostname\n    'colors'  | - change display colors\n");
+        printf("--------------------------------------------\n");
         printf("Autor Jan Kordas\nWydzial informatyki i informatyki UAM Poznan\n");
     }
     return;
@@ -194,25 +194,20 @@ void my_cd() {
     if (!strcmp(commands[0], "cd") && !commands[1]) {
         getcwd(dir_before_chdir, PATH_MAX);
         chdir(getenv("HOME"));
-        return;
     } else if (!strcmp(commands[0], "cd") && commands[1] && commands[2]) {
         printf("Too many arguments\n");
-        return;
     } else if (!strcmp(commands[0], "cd") && (!strcmp(commands[1], "~") || !strcmp(commands[1], "."))) {
         getcwd(dir_before_chdir, PATH_MAX);
         chdir(getenv("HOME"));
-        return;
     } else if (!strcmp(commands[0], "cd") && !strcmp(commands[1], "-")) {
         char dir_before_chdir_backup[PATH_MAX] = {0};
         memcpy(dir_before_chdir_backup, dir_before_chdir, strlen(dir_before_chdir));
         getcwd(dir_before_chdir, PATH_MAX);
         printf("%s\n", dir_before_chdir_backup);
         chdir(dir_before_chdir_backup);
-        return;
     } else if (!strcmp(commands[0], "cd") && !commands[1]) {
         getcwd(dir_before_chdir, PATH_MAX);
         chdir(commands[1]);
-        return;
     } else if (!strcmp(commands[0], "cd") && commands[1]) {
         getcwd(dir_before_chdir, PATH_MAX);
         chdir(commands[1]);
@@ -227,9 +222,10 @@ void my_cd() {
 
 void colors() {
     if (!strcmp(commands[0], "colors") && !commands[1]) {
-        printf("To change colors use command: 'color {name of color on list}'\n");
+        printf("\nTo change colors use command: 'color {name of color on list}'\n");
+        printf("-------------------------------------------------------------\n");
         printf("List of available colors:\n1.black\n2.red\n3.green\n4.yellow\n5.blue\n6.purple\n7.cyan\n8.white\n9.reset\n");
-        return;
+        printf("-------------------------------------------------------------\n");
     } else if (!strcmp(commands[0], "colors") && commands[1]) {
         printf("Too many arguments for function 'colors'\n");
     }
@@ -242,31 +238,22 @@ void color() {
             printf("No color selected, please try again.\nFor help type 'colors'\n");
         } else if (!strcmp(commands[1], "black") && !commands[2]) {
             printf(BLACK);
-            return;
         } else if (!strcmp(commands[1], "red") && !commands[2]) {
             printf(RED);
-            return;
         } else if (!strcmp(commands[1], "green") && !commands[2]) {
             printf(GREEN);
-            return;
         } else if (!strcmp(commands[1], "yellow") && !commands[2]) {
             printf(YELLOW);
-            return;
         } else if (!strcmp(commands[1], "blue") && !commands[2]) {
             printf(BLUE);
-            return;
         } else if (!strcmp(commands[1], "purple") && !commands[2]) {
             printf(PURPLE);
-            return;
         } else if (!strcmp(commands[1], "cyan") && !commands[2]) {
             printf(CYAN);
-            return;
         } else if (!strcmp(commands[1], "white") && !commands[2]) {
             printf(WHITE);
-            return;
         } else if (!strcmp(commands[1], "reset") && !commands[2]) {
             printf(RESET);
-            return;
         } else {
             printf("Could not match color, please try again.\nFor help type 'colors'\n");
         }
@@ -289,18 +276,14 @@ void my_mv_files() {
     int bytes_read = 0;
     if (!strcmp(commands[0], "mv") && !strcmp(commands[1], "-my") && (!commands[2] || !commands[3])) {
         printf("Mising file operand\n");
-        return;
     } else if (!strcmp(commands[0], "mv") && !strcmp(commands[1], "-my") && !strcmp(commands[2], commands[3])) {
         printf("'%s' and '%s' are the same file\n", commands[2], commands[3]);
-        return;
     } else if (!strcmp(commands[0], "mv") && !strcmp(commands[1], "-my") && commands[2] && commands[3] && commands[4]) {
         printf("Too much arguments to rename: %d\n", arguments_counter - 1);
-        return;
     } else if (!strcmp(commands[0], "mv") && !strcmp(commands[1], "-my") && commands[2] && commands[3] && !commands[4]) {
         source_file = open(commands[2], O_RDONLY);
         if (source_file < 0) {
             printf("Cannot find file or permission to file is denied: %s\n", commands[2]);
-            return;
         }
         destination_file = open(commands[3], O_CREAT | O_RDWR, 0644);
         while ((bytes_read = read(source_file, buf, sizeof(buf))) > 0) {
@@ -327,19 +310,15 @@ void my_cp_files() {
         printf("Command not recognized.\nDid you mean 'mv -my' or 'cp -my'?\n");
     } else if (!strcmp(commands[0], "cp") && !strcmp(commands[1], "-my") && (!commands[2] && !commands[3])) {
         printf("Missing file operand\n");
-        return;
     } else if (!strcmp(commands[0], "cp") && !strcmp(commands[1], "-my") && commands[2] && commands[3] && commands[4]) {
         printf("Too much arguments to copy file %d: \n", arguments_counter - 1);
-        return;
     } else if (!strcmp(commands[0], "cp") && !strcmp(commands[1], "-my") && !strcmp(commands[2], commands[3])) {
         printf("'%s' and '%s' are the same file\n", commands[2], commands[3]);
-        return;
     } else if (!strcmp(commands[0], "cp") && !strcmp(commands[1], "-my") && commands[2] && commands[3] && !commands[4]) {
         cp_dest_file = open(commands[3], O_CREAT | O_RDWR, 0644);
         cp_source_file = open(commands[2], O_RDONLY);
         if (cp_source_file < 0) {
             printf("Cannot find file or persmission to file is denied: %s\n", commands[2]);
-            return;
         }
         while ((cp_bytes_read = read(cp_source_file, cp_buf, sizeof(cp_buf))) > 0) {
             if (write(cp_dest_file, cp_buf, cp_bytes_read) != cp_bytes_read) {
