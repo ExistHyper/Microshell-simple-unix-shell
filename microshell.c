@@ -33,6 +33,7 @@ void color();
 void clear();
 void my_mv_files();
 void my_cp_files();
+int gethostname(char *name, size_t len);
 
 char arr_of_commands[][32] = {
     "hostname",
@@ -49,6 +50,7 @@ char arr_of_commands[][32] = {
 char *commands[SIZE];
 char input[SIZE];
 int arguments_counter = 0;
+char dir_before_chdir[PATH_MAX] = {0};
 
 int main() {
     printf(RED "****WELCOME TO MICROSHELL****\n"
@@ -188,8 +190,8 @@ void help_option() {
 }
 
 void my_cd() {
-    char dir_before_chdir[PATH_MAX];
     char dir_after_chdir[PATH_MAX];
+    char dir_before_chdir_backup[PATH_MAX];
 
     if (!strcmp(commands[0], "cd") && !commands[1]) {
         getcwd(dir_before_chdir, PATH_MAX);
@@ -200,11 +202,17 @@ void my_cd() {
         getcwd(dir_before_chdir, PATH_MAX);
         chdir(getenv("HOME"));
     } else if (!strcmp(commands[0], "cd") && !strcmp(commands[1], "-")) {
-        char dir_before_chdir_backup[PATH_MAX] = {0};
-        memcpy(dir_before_chdir_backup, dir_before_chdir, strlen(dir_before_chdir));
-        getcwd(dir_before_chdir, PATH_MAX);
-        printf("%s\n", dir_before_chdir_backup);
-        chdir(dir_before_chdir_backup);
+        for (int i = 0; i < PATH_MAX; i++){
+            dir_before_chdir_backup[i] = 0;
+        }
+        if (!dir_before_chdir[1]) {
+            printf("Previous directory not set\n");
+        } else {
+            memcpy(dir_before_chdir_backup, dir_before_chdir, strlen(dir_before_chdir));
+            getcwd(dir_before_chdir, PATH_MAX);
+            printf("%s\n", dir_before_chdir_backup);
+            chdir(dir_before_chdir_backup);
+        }
     } else if (!strcmp(commands[0], "cd") && !commands[1]) {
         getcwd(dir_before_chdir, PATH_MAX);
         chdir(commands[1]);
