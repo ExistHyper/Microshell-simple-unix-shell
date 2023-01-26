@@ -33,7 +33,6 @@ void color();
 void clear();
 void my_mv_files();
 void my_cp_files();
-int gethostname(char *name, size_t len);
 
 char arr_of_commands[][32] = {
     "hostname",
@@ -184,7 +183,7 @@ void help_option() {
         printf("-------------------------------------------- \n");
         printf("    'exit'    | - leave microshell\n    'cd'      | - change directory\n    'mv -my'  | - rename file\n    'cp -my'  | - copy file\n    'pwd'     | - display current directory\n    'whoami'  | - display login\n    'hostname'| - display hostname\n    'colors'  | - change display colors\n");
         printf("--------------------------------------------\n");
-        printf("Autor Jan Kordas\nWydzial informatyki i informatyki UAM Poznan\n");
+        printf("Autor Jan Kordas\nWydzial informatyki i informatyki UAM Poznan\n\n");
     }
     return;
 }
